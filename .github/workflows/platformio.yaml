@@ -44,8 +44,8 @@ jobs:
       run: |
         mkdir -p release
         if [ -f .pio/build/lolin32/firmware.bin ]; then mv .pio/build/lolin32/firmware.bin release/firmware-lolin32.bin; fi
-        if [ -f .pio/build/ShineWifiX/firmware.bin ]; then mv .pio/build/ShineWifiX/firmware.bin release/firmware-ShineWifiX.bin; fi
-        if [ -f .pio/build/ShineWifiS/firmware.bin ]; then mv .pio/build/ShineWifiS/firmware.bin release/firmware-ShineWiFiS.bin; fi
+        if [ -f .pio/build/ShineWiFiX/firmware.bin ]; then mv .pio/build/ShineWiFiX/firmware.bin release/firmware-ShineWiFiX.bin; fi
+        if [ -f .pio/build/ShineWiFiS/firmware.bin ]; then mv .pio/build/ShineWiFiS/firmware.bin release/firmware-ShineWiFiS.bin; fi
         if [ -f .pio/build/nodemcu-32s/firmware.bin ]; then mv .pio/build/nodemcu-32s/firmware.bin release/firmware-nodemcu-32s.bin; fi
         if [ -f .pio/build/d1/firmware.bin ]; then mv .pio/build/d1/firmware.bin release/firmware-d1.bin; fi
     - name: Prepare config for TLXH inverters
@@ -55,10 +55,13 @@ jobs:
       run: pio run -e ShineWifiX -e lolin32 -e nodemcu-32s -e d1
     - name: Adjust firmware filename for TLXH inverters
       run: |
-        if [ -f .pio/build/lolin32/firmware.bin ]; then mv .pio/build/lolin32/firmware.bin release/firmware-lolin32-TLXH.bin; fi
-        if [ -f .pio/build/ShineWifiX/firmware.bin ]; then mv .pio/build/ShineWiFiX/firmware.bin release/firmware-ShineWiFiX-TLXH.bin; fi
-        if [ -f .pio/build/nodemcu-32s/firmware.bin ]; then mv .pio/build/nodemcu-32s/firmware.bin release/firmware-nodemcu-32s-TLXH.bin; fi
-        if [ -f .pio/build/d1/firmware.bin ]; then mv .pio/build/d1/firmware.bin release/firmware-d1-TLXH.bin; fi
+        for f in .pio/build/*/firmware.bin; do
+          if [ -f "$f" ]; then
+            dir=$(dirname "$f")
+            target=$(basename "$dir")
+            mv "$f" "release/firmware-${target}-TLXH.bin"
+          fi
+        done
     - name: Upload firmware artifacts
       uses: actions/upload-artifact@v4
       with:
